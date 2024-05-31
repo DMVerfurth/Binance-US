@@ -14,6 +14,7 @@ class EventEmitter {
     }
 
     emit(event, data) {
+        
         if (!this.events[event]) return;
         for (const callback of this.events[event])
             callback(data);
@@ -408,11 +409,10 @@ class Web {
     }
 
     // https://docs.binance.us/#signature-authentication
-    generateSignature(data) {
+    generateSignature(data = {}) {
 
         Object.keys(data).forEach(key => data[key] === undefined && delete data[key])
         const query = new URLSearchParams(data);
-        query.sort();
         const hmac = crypto.createHmac('sha256', this.secretKey).update(query.toString());
         return hmac.digest('hex');
 
@@ -630,7 +630,7 @@ class Socket {
 
     // https://docs.binance.us/#request-format
     sendMessage = (method, id = 0, params) => this.socket.send(JSON.stringify({ id, method, params }));
-    sendMessageSigned = (method, id = 0, params) => {
+    sendMessageSigned = (method, id = 0, params = {}) => {
 
         params.apiKey = this.apiKey;
         params.timestamp = Date.now();
@@ -646,7 +646,7 @@ class Socket {
     }
 
     // https://docs.binance.us/#signature-authentication
-    generateSignature(data) {
+    generateSignature(data = {}) {
 
         Object.keys(data).forEach(key => data[key] === undefined && delete data[key])
         const query = new URLSearchParams(data);
